@@ -10,8 +10,6 @@ image_resource:
 inputs:
   - name: ert-concourse
   - name: tool-om
-
-outputs:
   - name: json_file
 
 run:

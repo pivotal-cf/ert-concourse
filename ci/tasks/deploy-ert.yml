@@ -10,17 +10,11 @@ image_resource:
 inputs:
   - name: ert-concourse
   - name: tool-om
-  - name: json_file
 
 run:
   path: ert-concourse/ci/tasks/deploy-ert.sh
 
 params:
-  pcf_iaas:
   pcf_ert_domain:
   pcf_opsman_admin:
   pcf_opsman_admin_passwd:
-  pcf_ert_ssl_cert:
-  pcf_ert_ssl_key:
-  terraform_template:
-  terraform_prefix:
