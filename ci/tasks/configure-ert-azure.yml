@@ -8,6 +8,7 @@ image_resource:
     repository: virtmerlin/c0-worker
 
 inputs:
+  - name: azure-concourse
   - name: ert-concourse
   - name: tool-om
 
