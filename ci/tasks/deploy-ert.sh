@@ -1,15 +1,8 @@
 #!/bin/bash
 set -e
 
-#############################################################
-#################### GCP Auth  & functions ##################
-#############################################################
-echo $gcp_svc_acct_key > /tmp/blah
-gcloud auth activate-service-account --key-file /tmp/blah
-rm -rf /tmp/blah
+json_file=$(cat json_file/json_file)
 
-gcloud config set project $gcp_proj_id
-gcloud config set compute/region $gcp_region
 
 # Setup OM Tool
 sudo cp tool-om/om-linux /usr/local/bin
@@ -17,27 +10,6 @@ sudo chmod 755 /usr/local/bin/om-linux
 
 # Set Vars
 
-# Set JSON Config Template and insert Concourse Parameter Values
-json_file_path="gcp-concourse/json-opsman/${gcp_pcf_terraform_template}"
-json_file_template="${json_file_path}/ert-template.json"
-json_file="${json_file_path}/ert.json"
-
-# Set SQL Instance Name since we have to add a guid to it when its Created
-gcloud_sql_instance_cmd="gcloud sql instances list --format json | jq '.[] | select(.instance | startswith(\"${gcp_terraform_prefix}\")) | .instance' | tr -d '\"'"
-gcloud_sql_instance=$(eval ${gcloud_sql_instance_cmd})
-gcloud_sql_instance_ip=$(gcloud sql instances list | grep ${gcloud_sql_instance} | awk '{print$4}')
-
-
-cp ${json_file_template} ${json_file}
-
-perl -pi -e "s/{{gcp_region}}/${gcp_region}/g" ${json_file}
-perl -pi -e "s/{{gcp_zone_1}}/${gcp_zone_1}/g" ${json_file}
-perl -pi -e "s/{{gcp_zone_2}}/${gcp_zone_2}/g" ${json_file}
-perl -pi -e "s/{{gcp_zone_3}}/${gcp_zone_3}/g" ${json_file}
-perl -pi -e "s/{{gcp_terraform_prefix}}/${gcp_terraform_prefix}/g" ${json_file}
-perl -pi -e "s/{{gcloud_sql_instance_ip}}/${gcloud_sql_instance_ip}/g" ${json_file}
-perl -pi -e "s/{{gcloud_sql_instance_username}}/${pcf_opsman_admin}/g" ${json_file}
-perl -pi -e "s/{{gcloud_sql_instance_password}}/${pcf_opsman_admin_passwd}/g" ${json_file}
 
 
 # Test if the ssl cert var from concourse is set to 'genrate'.  If so, script will gen a self signed, otherwise will assume its a cert
@@ -55,9 +27,7 @@ my_pcf_ert_ssl_key=$(echo ${pcf_ert_ssl_key} | sed 's/\s\+/\\\\r\\\\n/g' | sed '
 perl -pi -e "s|{{pcf_ert_ssl_cert}}|${my_pcf_ert_ssl_cert}|g" ${json_file}
 perl -pi -e "s|{{pcf_ert_ssl_key}}|${my_pcf_ert_ssl_key}|g" ${json_file}
 perl -pi -e "s/{{pcf_ert_domain}}/${pcf_ert_domain}/g" ${json_file}
-perl -pi -e "s|{{gcp_storage_access_key}}|${gcp_storage_access_key}|g" ${json_file}
-perl -pi -e "s|{{gcp_storage_secret_key}}|${gcp_storage_secret_key}|g" ${json_file}
-
+perl -pi -e "s/{{terraform_prefix}}/${terraform_prefix}/g" ${json_file}
 
 
 if [[ ! -f ${json_file} ]]; then
