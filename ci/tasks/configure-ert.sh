@@ -4,7 +4,7 @@ set -e
 
 
 # Set Vars
-json_file_path="azure-concourse/json-opsman/${terraform_template}"
+json_file_path="ert-concourse/json_templates/${pcf_iaas}/${terraform_template}"
 json_file_template="${json_file_path}/ert-template.json"
 json_file="json_file/ert.json"
 
