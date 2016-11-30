@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-json_file=$(cat json_file/json_file)
+json_file=$(cat json_file/ert.json)
 
 
 # Setup OM Tool
