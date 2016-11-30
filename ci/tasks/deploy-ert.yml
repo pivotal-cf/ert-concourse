@@ -10,6 +10,7 @@ image_resource:
 inputs:
   - name: ert-concourse
   - name: tool-om
+  - name: json_file
 
 run:
   path: ert-concourse/ci/tasks/deploy-ert.sh
