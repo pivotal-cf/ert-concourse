@@ -15,7 +15,7 @@ outputs:
   - name: json_file
 
 run:
-  path: ert-concourse/ci/tasks/configure-ert-azure.sh
+  path: ert-concourse/ci/tasks/configure-ert.sh
 
 params:
   pcf_iaas:
