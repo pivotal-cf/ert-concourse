@@ -12,7 +12,7 @@ inputs:
   - name: pivnet-elastic-runtime
 
 run:
-  path: ert-concourse/ci/tasks/ert/upload-ert.sh
+  path: ert-concourse/ci/tasks/upload-ert.sh
 
 params:
   pcf_ert_domain:
