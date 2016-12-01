@@ -19,6 +19,6 @@ fi
 # Iaas Specific ERT  JSON Edits
 
 if [[ -e ert-concourse/scripts/iaas-specific-config/${pcf_iaas}/run.sh ]]; then
-  echo "Executing ${$pcf_iaas} IaaS specific config ..."
+  echo "Executing ${pcf_iaas} IaaS specific config ..."
   ./ert-concourse/scripts/iaas-specific-config/${pcf_iaas}/run.sh
 fi
