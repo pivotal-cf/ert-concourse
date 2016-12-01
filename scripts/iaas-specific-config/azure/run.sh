@@ -4,9 +4,43 @@ set -e
 # Get JSON for ERT
 json_file="json_file/ert.json"
 
+# Setup OM Tool
+sudo cp tool-om/om-linux /usr/local/bin
+sudo chmod 755 /usr/local/bin/om-linux
+
 #######################################
 ############## Functions ##############
 #######################################
+
+function fn_om_linux_curl {
+
+    local curl_method=${1}
+    local curl_path=${2}
+    local curl_data=${3}
+
+     curl_cmd="om-linux --target https://opsman.$pcf_ert_domain -k \
+            --username \"$pcf_opsman_admin\" \
+            --password \"$pcf_opsman_admin_passwd\"  \
+            curl \
+            --request ${curl_method} \
+            --path ${curl_path}"
+
+    if [[ ! -z ${curl_data} ]]; then
+       curl_cmd="${curl_cmd} \
+            --data '${curl_data}'"
+    fi
+
+    echo ${curl_cmd} > /tmp/rqst_cmd.log
+    exec_out=$(((eval $curl_cmd | tee /tmp/rqst_stdout.log) 3>&1 1>&2 2>&3 | tee /tmp/rqst_stderr.log) &>/dev/null)
+
+    if [[ $(cat /tmp/rqst_stderr.log | grep "Status:" | awk '{print$2}') != "200" ]]; then
+      echo "Error Call Failed ...."
+      echo $(cat /tmp/rqst_stderr.log)
+      exit 1
+    else
+      echo $(cat /tmp/rqst_stdout.log)
+    fi
+}
 
 function fn_opsman_auth {
     ### No Inputs,   reads from vars set by config-director-json and authenticates to OpsMan
@@ -94,12 +128,10 @@ function fn_opsman_curl() {
   ####### Post Form Data Builder #######
 
             if [[ ! -z ${3} && ${1} == "POST" && ${4} != "--NOENCODE" && ! -z ${5} ]]; then
-                  if [[ ${2} == *"az_and_network_assignments"* ]]; then
-                    curl_form_data="-d \"utf8=%E2%9C%93&_method=patch&authenticity_token=${3}${5}\""
-                  else
-                    curl_form_data="-d \"utf8=%E2%9C%93&_method=put&authenticity_token=${3}${5}\""
-                  fi
+
+                  curl_form_data="-d \"utf8=%E2%9C%93&_method=put&authenticity_token=${3}${5}\""
                   echo "Im Gonna use this for data: ${curl_form_data}"
+
             elif [[ ${1} == "POST" && ! -z ${5} ]]; then
                   curl_form_data="${5}"
             else
@@ -122,36 +154,14 @@ function fn_json_to_post_data {
 
    return_var=""
 
-   if [[ $2 == "var" ]]; then
-     fn_metadata_keys_cmd="echo \$${1}_json | jq 'keys' | jq .[]"
-     fn_metadata_cmd="echo \$${1}_json"
-   elif [[ $2 == "file" ]]; then
-     fn_metadata_keys_cmd="cat ${json_file_path}/${3}.json | jq .[].${1} | jq 'keys' | jq .[]"
-     fn_metadata_cmd="cat ${json_file_path}/${3}.json | jq .[].${1}"
-   else
-     fn_err "$2 is not a matching json source type!!!"
-   fi
+   fn_metadata_keys_cmd="cat ${json_file} | jq .jobs | jq 'keys' | jq .[] | tr -d '\"'"
+   internet_connected=$(cat ${json_file} | jq .patch.internet_connected)
 
-   if [[ $(eval $fn_metadata_keys_cmd | grep '"pipeline_extension"' | wc -l) -eq 0 ]]; then
+   for key in $(eval $fn_metadata_keys_cmd); do
+       return_var="${return_var}&product_resources_form[$key][internet_connected]=${internet_connected}"
+   done
 
-         for key in $(eval $fn_metadata_keys_cmd); do
-           if [[ $(echo $key | tr -d '"') != "pipeline_extension" ]]; then
-             fn_metadata_key_value=$(eval $fn_metadata_cmd | jq .${key})
-             key=$(echo $key | tr -d '"')
-             fn_metadata_key_value=$(echo $fn_metadata_key_value | sed 's/^"//' | sed 's/"$//')
-             return_var="${return_var}&$key=$fn_metadata_key_value"
-          else
-             echo ""
-          fi
-         done
-
-   else
-          ext_json_data=$(eval $fn_metadata_cmd | jq .)
-          ext_cmd="$(eval $fn_metadata_cmd |  jq .pipeline_extension | tr -d '"') \${ext_json_data}"
-          return_var=$(eval ${ext_cmd})
-   fi
-
-   echo ${return_var}
+   echo "${return_var}"
 }
 
 function fn_urlencode {
@@ -182,8 +192,13 @@ function fn_run {
 
 
 # Auth to Opsman
+
+guid_cf=$(fn_om_linux_curl "GET" "/api/v0/staged/products" \
+            | jq '.[] | select(.type == "cf") | .guid' | tr -d '"' | grep "cf-.*")
+
 fn_opsman_auth
-csrf_token=$(fn_opsman_curl "GET" "" | grep csrf-token | awk '{print$3}' | sed 's/content=\"//' | sed 's/\"$//')
+csrf_token=$(fn_opsman_curl "GET" "products/${guid_cf}/resources/edit" | grep csrf-token | awk '{print$3}' | sed 's/content=\"//' | sed 's/\"$//')
+
 
 # Verify we have a current csrf-token
 if [[ -z ${csrf_token} ]]; then
@@ -194,3 +209,14 @@ else
   csrf_encoded_token=$(fn_urlencode ${csrf_token} | sed 's|\=|%3D|g')
   echo "csrf_encoded_token=${csrf_encoded_token}"
 fi
+
+
+post_data=$(fn_json_to_post_data)
+post_data=$(fn_urlencode $(echo "${post_data}"))
+
+echo "####################################################################"
+echo "PUSHING Resource Config FOR: ERT Azure Internet Connected ..."
+echo "####################################################################"
+
+chk_push=$(fn_opsman_curl "POST" "products/${guid_cf}/resources" "${csrf_encoded_token}" "" "${post_data}" 2>&1 )
+echo ${chk_push}

@@ -104,6 +104,6 @@
       "notifications": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []}
   },
   "patch": {
-    "internet_connected": false
+    "internet_connected": 0
   }
 }
