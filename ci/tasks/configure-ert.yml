@@ -27,9 +27,3 @@ params:
   pcf_az_3:
   terraform_template:
   terraform_prefix:
-  # IaaS Specific
-  gcp_proj_id:
-  gcp_region:
-  gcp_svc_acct_key:
-  gcp_storage_access_key:
-  gcp_storage_secret_key:
