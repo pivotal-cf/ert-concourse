@@ -8,9 +8,16 @@ sudo chmod 755 /usr/local/bin/om-linux
 
 mv /opt/terraform/terraform /usr/local/bin
 CWD=$(pwd)
-cd aws-prepare-get/terraform/c0-aws-base/
-cp $CWD/pcfawsops-terraform-state-get/terraform.tfstate .
 
+
+# Using aws admin account to copy the terraform template here
+export AWS_ACCESS_KEY_ID=${TF_VAR_aws_access_key}
+export AWS_SECRET_ACCESS_KEY=${TF_VAR_aws_secret_key}
+export AWS_DEFAULT_REGION=${TF_VAR_aws_region}
+
+#Clean AWS instances
+pip install awscli
+aws s3 cp s3://${bucket}/terraform.tfstate .
 while read -r line
 do
   `echo "$line" | awk '{print "export "$1"="$3}'`
@@ -20,13 +27,12 @@ export AWS_ACCESS_KEY_ID=`terraform state show aws_iam_access_key.pcf_iam_user_a
 export AWS_SECRET_ACCESS_KEY=`terraform state show aws_iam_access_key.pcf_iam_user_access_key | grep ^secret | awk '{print $3}'`
 export RDS_PASSWORD=`terraform state show aws_db_instance.pcf_rds | grep ^password | awk '{print $3}'`
 
+json_file="json_file/ert.json"
+
 cd $CWD
 
 # Set JSON Config Template and inster Concourse Parameter Values
 output_file_path="json_file/"
-json_file_path="ert-concourse/json-templates/${pcf_iaas}/${terraform_template}"
-json_file_template="${json_file_path}/ert-template.json"
-json_file="${json_file_path}/ert.json"
 
 perl -pi -e "s/{{aws_zone_1}}/${az1}/g" ${json_file}
 perl -pi -e "s/{{aws_zone_2}}/${az2}/g" ${json_file}
