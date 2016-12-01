@@ -6,7 +6,7 @@ set -e
 sudo cp tool-om/om-linux /usr/local/bin
 sudo chmod 755 /usr/local/bin/om-linux
 
-mv /opt/terraform/terraform /usr/local/bin
+cp /opt/terraform/terraform /usr/local/bin
 CWD=$(pwd)
 
 
@@ -46,4 +46,3 @@ perl -pi -e "s%{{aws_secret_key}}%${AWS_SECRET_ACCESS_KEY}%g" ${json_file}
 perl -pi -e "s/{{aws_region}}/${region}/g" ${json_file}
 perl -pi -e "s/{{s3_endpoint}}/${S3_ESCAPED}/g" ${json_file}
 perl -pi -e "s/{{syslog_host}}/${SYSLOG_HOST}/g" ${json_file}
-mv ${json_file} ${output_file_path}
