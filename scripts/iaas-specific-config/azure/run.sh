@@ -8,6 +8,9 @@ json_file="json_file/ert.json"
 sudo cp tool-om/om-linux /usr/local/bin
 sudo chmod 755 /usr/local/bin/om-linux
 
+# Set Opsman Host
+opsman_host="opsman.${pcf_ert_domain}"
+
 #######################################
 ############## Functions ##############
 #######################################
