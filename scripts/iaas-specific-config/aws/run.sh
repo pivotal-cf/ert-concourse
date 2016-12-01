@@ -29,6 +29,8 @@ export RDS_PASSWORD=`terraform state show aws_db_instance.pcf_rds | grep ^passwo
 
 json_file="json_file/ert.json"
 
+export S3_ESCAPED=${S3_ENDPOINT//\//\\/}
+
 cd $CWD
 
 # Set JSON Config Template and inster Concourse Parameter Values
