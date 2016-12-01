@@ -22,5 +22,14 @@ params:
   pcf_opsman_admin_passwd:
   pcf_ert_ssl_cert:
   pcf_ert_ssl_key:
+  pcf_az_1:
+  pcf_az_2:
+  pcf_az_3:
   terraform_template:
   terraform_prefix:
+  # IaaS Specific
+  gcp_proj_id: {{gcp_proj_id}}
+  gcp_region: {{gcp_region}}
+  gcp_svc_acct_key: {{gcp_svc_acct_key}}
+  gcp_storage_access_key: {{gcp_storage_access_key}}
+  gcp_storage_secret_key: {{gcp_storage_secret_key}}
