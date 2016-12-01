@@ -18,12 +18,7 @@ fi
 
 # Iaas Specific ERT  JSON Edits
 
-case ${pcf_iaas} in
-  "azure")
-   echo "No Specific ERT IaaS Config for ${pcf_iaas} at this time ..."
-  ;;
-  *)
-   echo "Error pcf_iaas:${pcf_iaas} not enabled at this time"
-   exit 1
-  ;;
-esac
+if [[ -e ert-concourse/scripts/iaas-specific-config/${pcf_iaas}/run.sh ]]; then
+  echo "Executing ${$pcf_iaas} IaaS specific config ..."
+  ./ert-concourse/scripts/iaas-specific-config/${pcf_iaas}/run.sh
+fi
