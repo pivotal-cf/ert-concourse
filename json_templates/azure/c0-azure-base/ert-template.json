@@ -102,5 +102,8 @@
       "autoscaling": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "bootstrap": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "notifications": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []}
+  },
+  "patch": {
+    "internet_connected": false
   }
 }
