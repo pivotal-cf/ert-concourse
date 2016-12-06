@@ -86,7 +86,7 @@
       "diego_cell": {"instance_type": {"id": "automatic"},"instances": 12,"elb_names": []},
       "doppler": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": []},
       "loggregator_trafficcontroller": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": []},
-      "tcp_router": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": [],"persistent_disk":{"size_mb":"automatic"}},
+      "tcp_router": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": ["{{terraform_prefix}}-tcp-lb"],"persistent_disk":{"size_mb":"automatic"}},
       "backup-prepare": {"instance_type": {"id": "automatic"},"instances": 0,"elb_names": [],"persistent_disk":{"size_mb":"automatic"}},
       "push-apps-manager": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "smoke-tests": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
