@@ -17,9 +17,9 @@
   "properties": {
     "properties": {
       ".properties.networking_point_of_entry": {
-        "value": "haproxy"
+        "value": "external_ssl"
         },
-      ".properties.networking_point_of_entry.haproxy.ssl_rsa_certificate": {
+      ".properties.networking_point_of_entry.external_ssl.ssl_rsa_certificate": {
         "value": {
           "cert_pem": "{{pcf_ert_ssl_cert}}",
           "private_key_pem": "{{pcf_ert_ssl_key}}"
@@ -75,8 +75,8 @@
       "uaadb": {"instance_type": {"id": "automatic"},"instances": 0,"elb_names": [],"persistent_disk":{"size_mb":"automatic"}},
       "uaa": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": []},
       "cloud_controller": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": [],"persistent_disk":{"size_mb":"automatic"}},
-      "ha_proxy": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": ["{{terraform_prefix}}-web-lb"]},
-      "router": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": []},
+      "ha_proxy": {"instance_type": {"id": "automatic"},"instances": 0,"elb_names": []},
+      "router": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": ["{{terraform_prefix}}-web-lb"]},
       "mysql_monitor": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "clock_global": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "cloud_controller_worker": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": []},
