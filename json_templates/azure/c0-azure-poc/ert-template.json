@@ -60,6 +60,9 @@
       },
       ".push-apps-manager.company_name": {
         "value": "{{terraform_prefix}}"
+      },
+      ".mysql_proxy.service_hostname": {
+        "value": "mysql-proxy-lb.sys.{{pcf_ert_domain}}"
       }
     }
   },
