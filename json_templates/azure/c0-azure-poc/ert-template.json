@@ -81,7 +81,7 @@
       "clock_global": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "cloud_controller_worker": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": []},
       "collector": {"instance_type": {"id": "automatic"},"instances": 0,"elb_names": []},
-      "diego_database": {"instance_type": {"id": "automatic"},"instances": 2,"elb_names": [],"persistent_disk":{"size_mb":"automatic"}},
+      "diego_database": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": [],"persistent_disk":{"size_mb":"automatic"}},
       "diego_brain": {"instance_type": {"id": "automatic"},"instances": 2,"elb_names": ["{{terraform_prefix}}-ssh-proxy-lb"],"persistent_disk":{"size_mb":"automatic"}},
       "diego_cell": {"instance_type": {"id": "automatic"},"instances": 3,"elb_names": []},
       "doppler": {"instance_type": {"id": "automatic"},"instances": 2,"elb_names": []},
