@@ -98,6 +98,15 @@ echo "==========================================================================
 json_properties=$(cat ${json_file} | jq .properties)
 fn_om_linux_curl "PUT" "/api/v0/staged/products/${guid_cf}/properties" "${json_properties}"
 
+json_errands=$(cat ${json_file} | jq .errands)
+if [ "${json_errands}" != "null" ]; then
+  # Set ERT Errands
+  echo "=============================================================================================="
+  echo "Setting Errands for: ${guid_cf}"
+  echo "=============================================================================================="
+  fn_om_linux_curl "PUT" "/api/v0/staged/products/${guid_cf}/errands" "${json_errands}"
+fi
+
 # Set Resource Configs
 echo "=============================================================================================="
 echo "Setting Resource Job Properties for: ${guid_cf}"
