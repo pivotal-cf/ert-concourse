@@ -12,7 +12,7 @@ sudo chmod 755 /usr/local/bin/om-linux
 
 
 
-# Test if the ssl cert var from concourse is set to 'genrate'.  If so, script will gen a self signed, otherwise will assume its a cert
+# Test if the ssl cert var from concourse is set to 'generate'.  If so, script will gen a self signed, otherwise will assume its a provided cert
 if [[ ${pcf_ert_ssl_cert} == "generate" ]]; then
   echo "=============================================================================================="
   echo "Generating Self Signed Certs for sys.${pcf_ert_domain} & cfapps.${pcf_ert_domain} ..."
@@ -104,8 +104,10 @@ echo "Setting Resource Job Properties for: ${guid_cf}"
 echo "=============================================================================================="
 json_jobs_configs=$(cat ${json_file} | jq .jobs )
 json_job_guids=$(fn_om_linux_curl "GET" "/api/v0/staged/products/${guid_cf}/jobs" | jq .)
+opsman_avail_jobs=$(echo ${json_job_guids} | jq .jobs[].name | tr -d '"')
 
-for job in $(echo ${json_jobs_configs} | jq . | jq 'keys' | jq .[] | tr -d '"'); do
+#for job in $(echo ${json_jobs_configs} | jq . | jq 'keys' | jq .[] | tr -d '"'); do
+for job in ${opsman_avail_jobs}; do
 
  json_job_guid_cmd="echo \${json_job_guids} | jq '.jobs[] | select(.name == \"${job}\") | .guid' | tr -d '\"'"
  json_job_guid=$(eval ${json_job_guid_cmd})
