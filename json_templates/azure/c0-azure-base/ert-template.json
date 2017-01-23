@@ -63,6 +63,9 @@
       },
       ".mysql_proxy.service_hostname": {
         "value": "mysql-proxy-lb.sys.{{pcf_ert_domain}}"
+      },
+      ".mysql_monitor.recipient_email": {
+        "value" : "c0-coreteam@pivotal.io"
       }
     }
   },

@@ -112,6 +112,9 @@
       },
       ".properties.syslog_host": {
         "value": "{{syslog_host}}"
+      },
+      ".mysql_monitor.recipient_email": {
+        "value" : "c0-coreteam@pivotal.io"
       }
     }
   },

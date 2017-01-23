@@ -100,6 +100,9 @@
       },
       ".push-apps-manager.company_name": {
         "value": "pcf-gcp"
+      },
+      ".mysql_monitor.recipient_email": {
+        "value" : "c0-coreteam@pivotal.io"
       }
     }
   },
