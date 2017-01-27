@@ -98,6 +98,15 @@ echo "==========================================================================
 json_properties=$(cat ${json_file} | jq .properties)
 fn_om_linux_curl "PUT" "/api/v0/staged/products/${guid_cf}/properties" "${json_properties}"
 
+json_errands=$(cat ${json_file} | jq .errands)
+if [ "${json_errands}" != "null" ]; then
+  # Set ERT Errands
+  echo "=============================================================================================="
+  echo "Setting Errands for: ${guid_cf}"
+  echo "=============================================================================================="
+  fn_om_linux_curl "PUT" "/api/v0/staged/products/${guid_cf}/errands" "${json_errands}"
+fi
+
 # Set Resource Configs
 echo "=============================================================================================="
 echo "Setting Resource Job Properties for: ${guid_cf}"
@@ -111,6 +120,11 @@ for job in ${opsman_avail_jobs}; do
 
  json_job_guid_cmd="echo \${json_job_guids} | jq '.jobs[] | select(.name == \"${job}\") | .guid' | tr -d '\"'"
  json_job_guid=$(eval ${json_job_guid_cmd})
+ if [ -z "${json_job_guid}" ]; then
+  echo "---------------------------------------------------------------------------------------------"
+  echo "No job named ${job} in this deployment - ignoring"
+  continue
+ fi
  json_job_config_cmd="echo \${json_jobs_configs} | jq '.[\"${job}\"]' "
  json_job_config=$(eval ${json_job_config_cmd})
  echo "---------------------------------------------------------------------------------------------"
