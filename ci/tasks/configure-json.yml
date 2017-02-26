@@ -26,6 +26,8 @@ params:
   pcf_ert_ssl_key:
   terraform_template:
   terraform_prefix:
+  ert_sql_db_username:
+  ert_sql_db_password:
   # IaaS Specific for GCP only
   gcp_proj_id:
   gcp_region:
