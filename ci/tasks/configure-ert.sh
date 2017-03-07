@@ -39,37 +39,50 @@ if [[ ! -f ${json_file} ]]; then
   exit 1
 fi
 
-function fn_om_linux_curl {
-
-    local curl_method=${1}
-    local curl_path=${2}
-    local curl_data=${3}
-
-     curl_cmd="om-linux --target https://opsman.$pcf_ert_domain -k \
-            --username \"$pcf_opsman_admin\" \
-            --password \"$pcf_opsman_admin_passwd\"  \
-            curl \
-            --request ${curl_method} \
-            --path ${curl_path}"
-
-    if [[ ! -z ${curl_data} ]]; then
-       curl_cmd="${curl_cmd} \
-            --data '${curl_data}'"
-    fi
-
-    echo ${curl_cmd} > /tmp/rqst_cmd.log
-    exec_out=$(((eval $curl_cmd | tee /tmp/rqst_stdout.log) 3>&1 1>&2 2>&3 | tee /tmp/rqst_stderr.log) &>/dev/null)
-
-    if [[ $(cat /tmp/rqst_stderr.log | grep "Status:" | awk '{print$2}') != "200" ]]; then
-      echo "Error Call Failed ...."
-      echo $(cat /tmp/rqst_stderr.log)
-      exit 1
-    else
-      echo $(cat /tmp/rqst_stdout.log)
-    fi
+function fn_om_linux_curl_fail {
+    echo ERROR
+    echo stdout:\n
+    cat /tmp/rqst_stdout.log >&2
+    echo
+    echo stderr:\n
+    cat /tmp/rqst_stderr.log >&2
 }
 
+function fn_om_linux_curl {
+  local curl_method=$1
+  local curl_path=$2
+  local curl_data=$3
 
+  args="--target https://opsman.$pcf_ert_domain -k \
+    --username $pcf_opsman_admin \
+    --password $pcf_opsman_admin_passwd  \
+    curl \
+    --request $curl_method \
+    --path $curl_path"
+
+  rm -f /tmp/rqst_stdout.log /tmp/rqst_stderr.log
+
+  set +e
+  if [ -n "$curl_data" ]; then
+    om-linux ${args} --data "${curl_data// /\\ }" 1> /tmp/rqst_stdout.log 2> /tmp/rqst_stderr.log
+  else
+    om-linux ${args} 1> /tmp/rqst_stdout.log 2> /tmp/rqst_stderr.log
+  fi
+
+  if [ $? -ne 0 ]; then
+    fn_om_linux_curl_fail
+    exit 1
+  fi
+
+  grep -s -q "Status: 200 OK" /tmp/rqst_stderr.log
+  if [ $? -ne 0 ]; then
+    fn_om_linux_curl_fail
+    exit 1
+  fi
+
+  set -e
+  cat /tmp/rqst_stdout.log
+}
 
 echo "=============================================================================================="
 echo "Deploying ERT @ https://opsman.$pcf_ert_domain ..."
@@ -87,16 +100,16 @@ echo "==========================================================================
 echo "Setting Availability Zones & Networks for: ${guid_cf}"
 echo "=============================================================================================="
 
-json_net_and_az=$(cat ${json_file} | jq .networks_and_azs)
-fn_om_linux_curl "PUT" "/api/v0/staged/products/${guid_cf}/networks_and_azs" "${json_net_and_az}"
+json_net_and_az=$(cat ${json_file} | jq -c .networks_and_azs)
+fn_om_linux_curl "PUT" "/api/v0/staged/products/${guid_cf}/networks_and_azs" "$json_net_and_az"
 
 # Set ERT Properties
 echo "=============================================================================================="
 echo "Setting Properties for: ${guid_cf}"
 echo "=============================================================================================="
 
-json_properties=$(cat ${json_file} | jq .properties)
-fn_om_linux_curl "PUT" "/api/v0/staged/products/${guid_cf}/properties" "${json_properties}"
+json_properties=$(cat ${json_file} | jq -c .properties)
+fn_om_linux_curl "PUT" "/api/v0/staged/products/${guid_cf}/properties" "$json_properties"
 
 # Set Resource Configs
 echo "=============================================================================================="
@@ -111,7 +124,7 @@ for job in ${opsman_avail_jobs}; do
 
  json_job_guid_cmd="echo \${json_job_guids} | jq '.jobs[] | select(.name == \"${job}\") | .guid' | tr -d '\"'"
  json_job_guid=$(eval ${json_job_guid_cmd})
- json_job_config_cmd="echo \${json_jobs_configs} | jq '.[\"${job}\"]' "
+ json_job_config_cmd="echo \${json_jobs_configs} | jq -c '.[\"${job}\"]' "
  json_job_config=$(eval ${json_job_config_cmd})
  echo "---------------------------------------------------------------------------------------------"
  echo "Setting ${json_job_guid} with --data=${json_job_config}..."
