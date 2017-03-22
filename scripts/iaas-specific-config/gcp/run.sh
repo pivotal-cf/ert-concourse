@@ -44,7 +44,7 @@ do
    eval "templateplaceholder={{${i}}}"
    eval "varname=\${$i}"
    eval "varvalue=$varname"
-   echo "replacing value for {{${i}}} in ${json_file} with the value of env var:${varname} "
+   echo "replacing value for ${templateplaceholder} in ${json_file} with the value of env var:${varname} "
    sed -i -e "s/$templateplaceholder/${varvalue}/g" ${json_file}
 done
 
