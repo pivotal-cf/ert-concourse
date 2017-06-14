@@ -22,10 +22,24 @@ if [[ ${pcf_ert_ssl_cert} == "generate" ]]; then
   export pcf_ert_ssl_key=$(cat sys.${pcf_ert_domain}.key)
 fi
 
+# test to see if the uaa cert var needs to be generated.
+if [[ ${pcf_ert_uaa_saml_cert} == "generate" ]]; then
+  echo "=============================================================================================="
+  echo "Generating Self Signed Certs for UAA SAML configuration on sys.${pcf_ert_domain} & cfapps.${pcf_ert_domain} ..."
+  echo "=============================================================================================="
+  ert-concourse/scripts/ssl/gen_ssl_certs.sh "login.${pcf_ert_domain}" "login.${pcf_ert_domain}"
+  export pcf_ert_uaa_saml_cert=$(cat login.${pcf_ert_domain}.crt)
+  export pcf_ert_uaa_saml_key=$(cat login.${pcf_ert_domain}.key)
+fi
+
 my_pcf_ert_ssl_cert=$(echo ${pcf_ert_ssl_cert} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nCERTIFICATE/ CERTIFICATE/g')
 my_pcf_ert_ssl_key=$(echo ${pcf_ert_ssl_key} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nRSA\\\\r\\\\nPRIVATE\\\\r\\\\nKEY/ RSA PRIVATE KEY/g')
+my_pcf_ert_uaa_saml_cert=$(echo ${pcf_ert_ssl_cert} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nCERTIFICATE/ CERTIFICATE/g')
+my_pcf_ert_uaa_saml_key=$(echo ${pcf_ert_ssl_key} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nRSA\\\\r\\\\nPRIVATE\\\\r\\\\nKEY/ RSA PRIVATE KEY/g')
 perl -pi -e "s|{{pcf_ert_ssl_cert}}|${my_pcf_ert_ssl_cert}|g" ${json_file}
 perl -pi -e "s|{{pcf_ert_ssl_key}}|${my_pcf_ert_ssl_key}|g" ${json_file}
+perl -pi -e "s|{{pcf_ert_uaa_saml_cert}}|${my_pcf_ert_uaa_saml_cert}|g" ${json_file}
+perl -pi -e "s|{{pcf_ert_uaa_saml_key}}|${my_pcf_ert_uaa_saml_key}|g" ${json_file}
 perl -pi -e "s/{{pcf_ert_domain}}/${pcf_ert_domain}/g" ${json_file}
 perl -pi -e "s/{{pcf_az_1}}/${pcf_az_1}/g" ${json_file}
 perl -pi -e "s/{{pcf_az_2}}/${pcf_az_2}/g" ${json_file}
