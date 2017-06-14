@@ -72,9 +72,6 @@
           "cert_pem": "{{pcf_ert_uaa_saml_cert}}",
           "private_key_pem": "{{pcf_ert_uaa_saml_key}}"
         }
-      },
-      ".properties.syslog_host": {
-        "value": "{{syslog_host}}"
       }
     }
   },
