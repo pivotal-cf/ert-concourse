@@ -111,7 +111,7 @@
       "autoscaling": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "bootstrap": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "notifications": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
-      "syslog": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []}
+      "syslog_adapter": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []}
   },
   "patch": {
     "internet_connected": 0
