@@ -40,6 +40,8 @@ DNS.3 = *.uaa.${SYS_DOMAIN}
 #IP.3 = ${VIP}
 DNS.4 = *.${APP_DOMAIN}
 #IP.4 = ${VIP}
+DNS.5 = login.${SYS_DOMAIN}
+#IP.5 = ${VIP}
 EOM
 fi
 

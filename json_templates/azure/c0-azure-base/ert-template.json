@@ -66,6 +66,12 @@
       },
       ".mysql_monitor.recipient_email": {
         "value" : "c0-coreteam@pivotal.io"
+      },
+      ".uaa.service_provider_key_credentials": {
+        "value": {
+          "cert_pem": "{{pcf_ert_uaa_saml_cert}}",
+          "private_key_pem": "{{pcf_ert_uaa_saml_key}}"
+        }
       }
     }
   },
@@ -104,7 +110,10 @@
       "mysql-rejoin-unsafe": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "autoscaling": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
       "bootstrap": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
-      "notifications": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []}
+      "notifications": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
+      "syslog_adapter": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
+      "syslog_scheduler": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []},
+      "nfsbrokerpush": {"instance_type": {"id": "automatic"},"instances": 1,"elb_names": []}
   },
   "patch": {
     "internet_connected": 0
