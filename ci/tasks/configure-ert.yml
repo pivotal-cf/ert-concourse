@@ -27,3 +27,9 @@ params:
   pcf_az_3:
   terraform_template:
   terraform_prefix:
+  azure_access_key:
+  azure_account_name:
+  azure_buildpacks_container:
+  azure_droplets_container:
+  azure_packages_container:
+  azure_resources_container:
