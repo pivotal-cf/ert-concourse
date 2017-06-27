@@ -32,12 +32,12 @@ perl -pi -e "s/{{terraform_prefix}}/${terraform_prefix}/g" ${json_file}
 
 if [[ "${azure_access_key}" != "" ]]; then
 cat ${json_file} | jq \
-  --arg azure_access_key ${azure_access_key} \
-  --arg azure_account_name ${azure_account_name} \
-  --arg azure_buildpacks_container ${azure_buildpacks_container} \
-  --arg azure_droplets_container ${azure_droplets_container} \
-  --arg azure_packages_container ${azure_packages_container} \
-  --arg azure_resources_container ${azure_resources_container} \
+  --arg azure_access_key "${azure_access_key}" \
+  --arg azure_account_name "${azure_account_name}" \
+  --arg azure_buildpacks_container "${azure_buildpacks_container}" \
+  --arg azure_droplets_container "${azure_droplets_container}" \
+  --arg azure_packages_container "${azure_packages_container}" \
+  --arg azure_resources_container "${azure_resources_container}" \
     '
     .properties.properties |= .+ {
     ".properties.system_blobstore.external_azure.access_key": {
