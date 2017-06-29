@@ -80,6 +80,10 @@ cat ${json_file} | jq \
     mv /tmp/ert.json ${json_file}
 fi
 
+echo "file=[${json_file}]"
+echo $file | cat $file
+echo "Flushed the json file to output"
+
 if [[ ! -f ${json_file} ]]; then
   echo "Error: cant find file=[${json_file}]"
   exit 1
