@@ -19,7 +19,7 @@
       ".properties.networking_point_of_entry": {
         "value": "{{pcf_ert_networking_pointofentry}}"
       },
-      ".properties.networking_point_of_entry.external_ssl.ssl_rsa_certificate": {
+      ".properties.networking_point_of_entry.{{pcf_ert_networking_pointofentry}}.ssl_rsa_certificate": {
         "value": {
           "cert_pem": "{{pcf_ert_ssl_cert}}",
           "private_key_pem": "{{pcf_ert_ssl_key}}"
