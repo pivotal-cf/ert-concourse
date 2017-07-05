@@ -195,7 +195,9 @@
         "id": "automatic"
       },
       "instances": 0,
-      "elb_names": []
+      "elb_names": [
+        "{{pcf-web-lb-haproxy}}"
+      ]
     },
     "router": {
       "instance_type": {
@@ -203,7 +205,7 @@
       },
       "instances": 2,
       "elb_names": [
-        "{{terraform_prefix}}-web-lb"
+        "{{pcf-web-lb-router}}"
       ]
     },
     "mysql_monitor": {
@@ -260,7 +262,7 @@
       "instance_type": {
         "id": "automatic"
       },
-      "instances": 12,
+      "instances": 3,
       "elb_names": []
     },
     "doppler": {
