@@ -34,6 +34,17 @@ my_pcf_ert_ssl_key=$(echo ${pcf_ert_ssl_key} | sed 's/\s\+/\\\\r\\\\n/g' | sed '
 my_pcf_ert_saml_cert=$(echo ${pcf_ert_saml_cert} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nCERTIFICATE/ CERTIFICATE/g')
 my_pcf_ert_saml_key=$(echo ${pcf_ert_saml_key} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nRSA\\\\r\\\\nPRIVATE\\\\r\\\\nKEY/ RSA PRIVATE KEY/g')
 perl -pi -e "s|{{pcf_ert_networking_pointofentry}}|${pcf_ert_networking_pointofentry}|g" ${json_file}
+
+my_web_lb="${terraform_prefix}-web-lb"
+if [[ ${pcf_ert_networking_pointofentry} == "haproxy" ]]; then
+  perl -pi -e "s|{{pcf-web-lb-haproxy}}|${my_web_lb}|g" ${json_file}
+  perl -pi -e "s|{{pcf-web-lb-router}}||g" ${json_file}
+fi
+if [[ ${pcf_ert_networking_pointofentry} == "external_ssl" || ${pcf_ert_networking_pointofentry} == "external_non_ssl" ]]; then
+  perl -pi -e "s|{{pcf-web-lb-router}}|${my_web_lb}|g" ${json_file}
+  perl -pi -e "s|{{pcf-web-lb-haproxy}}||g" ${json_file}
+fi
+
 perl -pi -e "s|{{pcf_ert_ssl_cert}}|${my_pcf_ert_ssl_cert}|g" ${json_file}
 perl -pi -e "s|{{pcf_ert_ssl_key}}|${my_pcf_ert_ssl_key}|g" ${json_file}
 perl -pi -e "s|{{pcf_ert_saml_cert}}|${my_pcf_ert_saml_cert}|g" ${json_file}
