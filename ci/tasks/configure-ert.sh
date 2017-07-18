@@ -19,21 +19,51 @@ if [[ ${pcf_ert_ssl_cert} == "generate" ]]; then
   export pcf_ert_ssl_key=$(cat sys.${pcf_ert_domain}.key)
 fi
 
+# Test if the saml cert var from concourse is set to 'generate'.  If so, script will gen a self signed, otherwise will assume its a provided cert
+if [[ ${pcf_ert_saml_cert} == "generate" ]]; then
+  echo "=============================================================================================="
+  echo "Generating Self Signed Certs for login.sys.${pcf_ert_domain} ..."
+  echo "=============================================================================================="
+  ert-concourse/scripts/ssl/gen_ssl_certs.sh "login.sys.${pcf_ert_domain}"
+  export pcf_ert_saml_cert=$(cat login.sys.${pcf_ert_domain}.crt)
+  export pcf_ert_saml_key=$(cat login.sys.${pcf_ert_domain}.key)
+fi
+
 my_pcf_ert_ssl_cert=$(echo ${pcf_ert_ssl_cert} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nCERTIFICATE/ CERTIFICATE/g')
 my_pcf_ert_ssl_key=$(echo ${pcf_ert_ssl_key} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nRSA\\\\r\\\\nPRIVATE\\\\r\\\\nKEY/ RSA PRIVATE KEY/g')
+my_pcf_ert_saml_cert=$(echo ${pcf_ert_saml_cert} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nCERTIFICATE/ CERTIFICATE/g')
+my_pcf_ert_saml_key=$(echo ${pcf_ert_saml_key} | sed 's/\s\+/\\\\r\\\\n/g' | sed 's/\\\\r\\\\nRSA\\\\r\\\\nPRIVATE\\\\r\\\\nKEY/ RSA PRIVATE KEY/g')
+perl -pi -e "s|{{pcf_ert_networking_pointofentry}}|${pcf_ert_networking_pointofentry}|g" ${json_file}
+
+my_web_lb="${terraform_prefix}-web-lb"
+if [[ ${pcf_ert_networking_pointofentry} == "haproxy" ]]; then
+  perl -pi -e "s|{{pcf-web-lb-haproxy}}|${my_web_lb}|g" ${json_file}
+  perl -pi -e "s|{{pcf-web-lb-router}}||g" ${json_file}
+fi
+if [[ ${pcf_ert_networking_pointofentry} == "external_ssl" || ${pcf_ert_networking_pointofentry} == "external_non_ssl" ]]; then
+  perl -pi -e "s|{{pcf-web-lb-router}}|${my_web_lb}|g" ${json_file}
+  perl -pi -e "s|{{pcf-web-lb-haproxy}}||g" ${json_file}
+fi
+
 perl -pi -e "s|{{pcf_ert_ssl_cert}}|${my_pcf_ert_ssl_cert}|g" ${json_file}
 perl -pi -e "s|{{pcf_ert_ssl_key}}|${my_pcf_ert_ssl_key}|g" ${json_file}
+perl -pi -e "s|{{pcf_ert_saml_cert}}|${my_pcf_ert_saml_cert}|g" ${json_file}
+perl -pi -e "s|{{pcf_ert_saml_key}}|${my_pcf_ert_saml_key}|g" ${json_file}
 perl -pi -e "s/{{pcf_ert_domain}}/${pcf_ert_domain}/g" ${json_file}
 perl -pi -e "s/{{pcf_az_1}}/${pcf_az_1}/g" ${json_file}
 perl -pi -e "s/{{pcf_az_2}}/${pcf_az_2}/g" ${json_file}
 perl -pi -e "s/{{pcf_az_3}}/${pcf_az_3}/g" ${json_file}
 perl -pi -e "s/{{terraform_prefix}}/${terraform_prefix}/g" ${json_file}
 
+# Use prefix to strip down a Storage Account Prefix String
+env_short_name=$(echo ${azure_terraform_prefix} | tr -d "-" | tr -d "_" | tr -d "[0-9]")
+env_short_name=$(echo ${env_short_name:0:10})
+ert_azure_account_name = $(echo $env_short_name$azure_account_name)
 
 if [[ "${azure_access_key}" != "" ]]; then
 cat ${json_file} | jq \
   --arg azure_access_key "${azure_access_key}" \
-  --arg azure_account_name "${azure_account_name}" \
+  --arg azure_account_name "${ert_azure_account_name}" \
   --arg azure_buildpacks_container "${azure_buildpacks_container}" \
   --arg azure_droplets_container "${azure_droplets_container}" \
   --arg azure_packages_container "${azure_packages_container}" \
@@ -67,6 +97,10 @@ cat ${json_file} | jq \
     ' > /tmp/ert.json
     mv /tmp/ert.json ${json_file}
 fi
+
+echo "file=[${json_file}]"
+echo $file | cat $file
+echo "Flushed the json file to output"
 
 if [[ ! -f ${json_file} ]]; then
   echo "Error: cant find file=[${json_file}]"

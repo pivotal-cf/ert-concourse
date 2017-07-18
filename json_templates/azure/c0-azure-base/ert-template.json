@@ -17,12 +17,18 @@
   "properties": {
     "properties": {
       ".properties.networking_point_of_entry": {
-        "value": "external_ssl"
+        "value": "{{pcf_ert_networking_pointofentry}}"
       },
-      ".properties.networking_point_of_entry.external_ssl.ssl_rsa_certificate": {
+      ".properties.networking_point_of_entry.{{pcf_ert_networking_pointofentry}}.ssl_rsa_certificate": {
         "value": {
           "cert_pem": "{{pcf_ert_ssl_cert}}",
           "private_key_pem": "{{pcf_ert_ssl_key}}"
+        }
+      },
+      ".uaa.service_provider_key_credentials": {
+        "value": {
+          "cert_pem": "{{pcf_ert_saml_cert}}",
+          "private_key_pem": "{{pcf_ert_saml_key}}"
         }
       },
       ".properties.tcp_routing": {
@@ -189,7 +195,9 @@
         "id": "automatic"
       },
       "instances": 0,
-      "elb_names": []
+      "elb_names": [
+        "{{pcf-web-lb-haproxy}}"
+      ]
     },
     "router": {
       "instance_type": {
@@ -197,7 +205,7 @@
       },
       "instances": 2,
       "elb_names": [
-        "{{terraform_prefix}}-web-lb"
+        "{{pcf-web-lb-router}}"
       ]
     },
     "mysql_monitor": {
@@ -254,7 +262,7 @@
       "instance_type": {
         "id": "automatic"
       },
-      "instances": 12,
+      "instances": 3,
       "elb_names": []
     },
     "doppler": {
