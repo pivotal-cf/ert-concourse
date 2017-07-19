@@ -56,9 +56,13 @@ perl -pi -e "s/{{pcf_az_3}}/${pcf_az_3}/g" ${json_file}
 perl -pi -e "s/{{terraform_prefix}}/${terraform_prefix}/g" ${json_file}
 
 # Use prefix to strip down a Storage Account Prefix String
+echo $azure_terraform_prefix
 env_short_name=$(echo ${azure_terraform_prefix} | tr -d "-" | tr -d "_" | tr -d "[0-9]")
+echo $env_short_name
 env_short_name=$(echo ${env_short_name:0:10})
+echo $env_shot_name
 ert_azure_account_name=$(echo {$env_short_name$azure_account_name})
+echo $ert_azure_account_name
 
 if [[ "${azure_access_key}" != "" ]]; then
 cat ${json_file} | jq \
