@@ -61,7 +61,7 @@ env_short_name=$(echo ${azure_terraform_prefix} | tr -d "-" | tr -d "_" | tr -d 
 echo $env_short_name
 env_short_name=$(echo ${env_short_name:0:10})
 echo $env_shot_name
-ert_azure_account_name=$(echo {$env_short_name$azure_account_name})
+ert_azure_account_name=$(echo $env_short_name$azure_account_name)
 echo $ert_azure_account_name
 
 if [[ "${azure_access_key}" != "" ]]; then
